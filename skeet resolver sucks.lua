@@ -48,21 +48,39 @@ local function resolve(player)
     plist_set(player, "Force body yaw value", yaw_value)
 end
 
--- Variável para garantir que a ESP flag só seja registrada uma vez
+-- Variável para controlar se a ESP flag foi registrada
 local esp_flag_registered = false
 
--- Variável para rastrear o último tempo de atualização
-local last_update_time = 0
+-- Função para registrar a ESP flag
+local function register_esp_flag()
+    if esp_flag_registered then return end
+
+    -- Registra a flag de ESP
+    client.register_esp_flag("Resolved", 0, 255, 0, function(entindex)
+        -- Verifica se a checkbox "Enable resolver ESP flag" está ativada
+        if not ui.get(enable_resolver_esp_checkbox) then
+            return false -- Retorna false para ocultar a flag
+        end
+
+        if not entity_is_enemy(entindex) then
+            return false
+        end
+
+        -- Verifica se o yaw do corpo está forçado
+        return plist_get(entindex, "Force body yaw") == true
+    end)
+
+    esp_flag_registered = true
+end
 
 -- Função chamada a cada atualização de rede
-local function onpaint()
-    local current_time = client.timestamp()
-
-    -- Executa o código a cada 100 ms para evitar processamento excessivo
-    if current_time - last_update_time < 100 then
-        return
+local function on_paint()
+    -- Verifica se a checkbox "Enable resolver ESP flag" está ativada
+    if ui.get(enable_resolver_esp_checkbox) then
+        if not esp_flag_registered then
+            register_esp_flag() -- Registra a ESP flag se ainda não estiver registrada
+        end
     end
-    last_update_time = current_time
 
     local enemies = getplayer(true) -- Obtém todos os inimigos
     for i = 1, #enemies do
@@ -72,23 +90,8 @@ local function onpaint()
         if ui.get(enable_resolver_checkbox) then
             resolve(player) -- Resolve a posição do jogador
         end
-
-        -- Verifica se a checkbox "Enable resolver ESP flag" está ativada
-        if ui.get(enable_resolver_esp_checkbox) and not esp_flag_registered then
-            -- Registra um flag de ESP para indicar que o jogador foi resolvido
-            client.register_esp_flag("Resolved", 0, 255, 0, function(entindex)
-                if not entity_is_enemy(entindex) then
-                    return false
-                end
-
-                -- Verifica se o yaw do corpo está forçado
-                return plist_get(entindex, "Force body yaw") == true
-            end)
-            -- Marca que a ESP flag foi registrada
-            esp_flag_registered = true
-        end
     end
 end
 
 -- Define o callback para a atualização de rede
-client.set_event_callback('net_update_start', onpaint)
+client.set_event_callback('paint', on_paint)
