@@ -6,9 +6,10 @@ local enable_resolver_checkbox = ui.new_checkbox("Lua", "B", "Enable resolver")
 -- Adiciona a checkbox "Enable resolver ESP flag" abaixo da checkbox "Enable resolver"
 local enable_resolver_esp_checkbox = ui.new_checkbox("Lua", "B", "Enable resolver ESP flag")
 
--- Adiciona o botão "Credits for the Resolver"
-local copy_link_button = ui.new_button("Lua", "B", "Credits for the Resolver", function()
-    client.log("bernas198YT Discord Server: " .. url)
+local discord_button = ui.new_button("Lua", "B", "Credits for the Resolver", function()
+    panorama.loadstring([[
+        SteamOverlayAPI.OpenExternalBrowserURL("]] .. url .. [[");
+    ]])()
 end)
 
 local plist_set, plist_get = plist.set, plist.get
