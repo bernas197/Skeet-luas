@@ -6,7 +6,6 @@ client.log("Dev: bernas198")
 
 
 local player_models = {
-    ["Nigga_Balla"] = "models/player/custom_player/eminem/gta_sa/vla2.mdl",
     ["White Balla"] = "models/player/custom_player/eminem/gta_sa/ballas1.mdl",
     ["Somyst"] = "models/player/custom_player/eminem/gta_sa/somyst.mdl",
     ["vwfypro"] = "models/player/custom_player/eminem/gta_sa/vwfypro.mdl",
